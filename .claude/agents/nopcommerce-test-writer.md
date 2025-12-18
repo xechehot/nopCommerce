@@ -244,6 +244,7 @@ await asyncAction.Should().ThrowAsync<Exception>();
 ✅ Use async/await properly
 ✅ Test against real services (integration style)
 ✅ Place tests in correct namespace matching source structure
+✅ Implement tests by using existing products and adding locale resources. 
 
 ### DON'T:
 ❌ NEVER mock services - use real implementations via DI
