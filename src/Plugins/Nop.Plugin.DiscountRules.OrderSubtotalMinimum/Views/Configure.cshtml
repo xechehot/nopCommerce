@@ -1,0 +1,97 @@
+@model Nop.Plugin.DiscountRules.OrderSubtotalMinimum.Models.RequirementModel
+@{
+    Layout = "";
+}
+
+<script>
+    $(function() {
+        $('#saveordersubtotalminimumrequirement@(Model.RequirementId)').click(function () {
+            var minimumAmount = $("#@Html.IdFor(model => model.MinimumAmount)").val();
+            var includingTax = $("#@Html.IdFor(model => model.IncludingTax)").is(':checked');
+            var discountId = @Model.DiscountId;
+            var requirementId = @Model.RequirementId;
+
+            var postData = {
+                DiscountId: discountId,
+                RequirementId: requirementId,
+                MinimumAmount: minimumAmount,
+                IncludingTax: includingTax
+            };
+            addAntiForgeryToken(postData);
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("Configure", "DiscountRulesOrderSubtotalMinimum"))",
+                data: postData,
+                success: function (data, textStatus, jqXHR) {
+                    var $alertInfoEl = $("#saveordersubtotalminimumrequirementAlert-info");
+                    let response = jqXHR.responseJSON;
+                    if (response instanceof Object && response.hasOwnProperty('Errors')) {
+                        var errorMessages = '';
+                        $.each(response.Errors, function (i, error) {
+                            errorMessages += error;
+                            if (response.Errors.length - 1 != i)
+                                errorMessages += '</br>';
+                        });
+                        $alertInfoEl.html(errorMessages);
+                        $("#saveordersubtotalminimumrequirementAlert").trigger("click");
+                        return;
+                    }
+
+                    $('#pnl-save-requirement-result@(Model.RequirementId)').fadeIn("slow").delay(1000).fadeOut("slow");
+                    @if (Model.RequirementId == 0)
+                    {
+                        <text>$("#discountRequirementContainer").trigger('nopnewdiscountruleadded', [data.NewRequirementId]);</text>
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    var $alertInfoEl = $("#saveordersubtotalminimumrequirementAlert-info");
+                    $alertInfoEl.html('@T("Admin.Promotions.Discounts.Requirements.FailedToSave")');
+                    $("#saveordersubtotalminimumrequirementAlert").trigger("click");
+                }
+            });
+        });
+    });
+</script>
+
+<div class="form-group row">
+    <div class="col-md-3 requirement-label-col">
+        <nop-label asp-for="MinimumAmount" />
+    </div>
+    <div class="col-md-9 requirement-data-col">
+        <div class="requirement-data-input">
+            <nop-editor asp-for="MinimumAmount" />
+        </div>
+        <span asp-validation-for="MinimumAmount"></span>
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="col-md-3 requirement-label-col">
+        <nop-label asp-for="IncludingTax" />
+    </div>
+    <div class="col-md-9 requirement-data-col">
+        <div class="requirement-data-input">
+            <nop-editor asp-for="IncludingTax" />
+        </div>
+        <span asp-validation-for="IncludingTax"></span>
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="offset-md-3 col-md-9 requirement-data-col">
+        <div class="requirement-data-buttons">
+            <button type="button" id="saveordersubtotalminimumrequirement@(Model.RequirementId)" class="btn btn-primary">@T("Admin.Common.Save")</button>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="offset-md-3 col-md-9 requirement-messages-col">
+        <div id="pnl-save-requirement-result@(Model.RequirementId)" style="display: none;" class="text-green margin-t-5">
+            @T("Admin.Promotions.Discounts.Requirements.Saved")
+        </div>
+    </div>
+</div>
+<nop-alert asp-alert-id="saveordersubtotalminimumrequirementAlert" />

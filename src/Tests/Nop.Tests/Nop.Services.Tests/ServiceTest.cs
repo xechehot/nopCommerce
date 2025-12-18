@@ -7,6 +7,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Infrastructure;
 using Nop.Data.Configuration;
+using Nop.Plugin.DiscountRules.OrderSubtotalMinimum;
 using Nop.Services.Configuration;
 using Nop.Services.Plugins;
 using Nop.Tests.Nop.Services.Tests.Directory;
@@ -87,6 +88,14 @@ public abstract class ServiceTest : BaseNopTest
                     FriendlyName = "Test pickup point provider",
                     Installed = true,
                     ReferencedAssembly = typeof(PickupPointTestProvider).Assembly
+                }, true),
+                (new PluginDescriptor
+                {
+                    PluginType = typeof(OrderSubtotalMinimumDiscountRequirementRule),
+                    SystemName = "DiscountRequirement.OrderSubtotalMinimum",
+                    FriendlyName = "Order subtotal minimum discount requirement",
+                    Installed = true,
+                    ReferencedAssembly = typeof(OrderSubtotalMinimumDiscountRequirementRule).Assembly
                 }, true)
             }
         };
